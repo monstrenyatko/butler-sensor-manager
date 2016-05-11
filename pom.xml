@@ -1,0 +1,222 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maintainer>Oleg Kovalenko &lt;monstrenyatko@gmail.com&gt;</maintainer>
+		<homepage>https://github.com/monstrenyatko/butler-sensor-manager</homepage>
+		<debDepends>java8-runtime-headless</debDepends>
+		<architecture>all</architecture>
+		<hibernate.version>5.0.1.Final</hibernate.version>
+		<appMainClass>com.monstrenyatko.butler.sensor.manager.SensorManager</appMainClass>
+	</properties>
+
+	<groupId>com.monstrenyatko.butler</groupId>
+	<artifactId>butler-sensor-manager</artifactId>
+	<packaging>jar</packaging>
+	<version>0.0.1</version>
+	<description>Daemon that manages sensors, processes telemetry data and inserts it to DB.</description>
+
+	<repositories>
+		<repository>
+			<id>Eclipse Paho Repo</id>
+			<url>https://repo.eclipse.org/content/repositories/paho-releases/</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<!-- Maven compiler plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<!-- Maven Eclipse plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+			<!-- Maven Surefire plugin for Unit-Tests -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18.1</version>
+				<configuration>
+					<systemPropertyVariables>
+						<log4j.configuration>log4j2-test.properties</log4j.configuration>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+			<!-- JAR packaging plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<!-- disable -->
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Assembly plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<id>make-assembly</id>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<appendAssemblyId>false</appendAssemblyId>
+					<attach>true</attach>
+					<archive>
+						<manifest>
+							<mainClass>${appMainClass}</mainClass>
+						</manifest>
+						<manifestEntries>
+							<Built-By>${maintainer}</Built-By>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- DEB packaging plugin -->
+			<plugin>
+				<groupId>org.vafer</groupId>
+				<artifactId>jdeb</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jdeb</goal>
+						</goals>
+						<configuration>
+							<verbose>true</verbose>
+							<deb>${project.build.directory}/${project.artifactId}-${project.version}-${architecture}.deb</deb>
+							<dataSet>
+								<data>
+									<src>${project.build.directory}/${project.build.finalName}.jar</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/usr/lib/${project.artifactId}</prefix>
+									</mapper>
+								</data>
+								<data>
+									<type>link</type>
+									<linkName>/usr/lib/${project.artifactId}/${project.artifactId}.jar</linkName>
+									<linkTarget>${project.build.finalName}.jar</linkTarget>
+									<symlink>true</symlink>
+								</data>
+								<data>
+									<src>${basedir}/src/deb/bin/${project.artifactId}.sh</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<filemode>755</filemode>
+										<prefix>/usr/lib/${project.artifactId}</prefix>
+									</mapper>
+								</data>
+								<data>
+									<src>${basedir}/src/deb/init.d/${project.artifactId}</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<filemode>755</filemode>
+										<prefix>/etc/init.d</prefix>
+									</mapper>
+								</data>
+								<data>
+									<src>${basedir}/src/deb/config/log4j2.xml</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/etc/${project.artifactId}</prefix>
+									</mapper>
+								</data>
+								<data>
+									<src>${basedir}/src/deb/config/config.json</src>
+									<type>file</type>
+									<mapper>
+										<type>perm</type>
+										<prefix>/etc/${project.artifactId}</prefix>
+									</mapper>
+								</data>
+							</dataSet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<!-- JUnit -->
+		<dependency>
+			<scope>test</scope>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+		</dependency>
+		<!-- Mockito -->
+		<dependency>
+			<scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>1.10.19</version>
+		</dependency>
+		<!-- Log4j API -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<!-- Log4j Impl -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.5</version>
+		</dependency>
+		<!-- Json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20160212</version>
+		</dependency>
+		<!-- MQTT Paho -->
+		<dependency>
+			<groupId>org.eclipse.paho</groupId>
+			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<!-- Guava -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>19.0</version>
+		</dependency>
+	</dependencies>
+</project>

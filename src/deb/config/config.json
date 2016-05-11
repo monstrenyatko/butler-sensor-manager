@@ -1,0 +1,7 @@
+{
+	"net" : {
+		"mqtt" : {
+			"persistence_dir" : "/var/run/butler-sensor-manager/mqtt"
+		}
+	}
+}

@@ -1,0 +1,9 @@
+Package: [[name]]
+Version: [[version]]
+Section: net
+Priority: optional
+Architecture: [[architecture]]
+Depends: [[debDepends]]
+Description: [[description]]
+Maintainer: [[maintainer]]
+Homepage: [[homepage]]

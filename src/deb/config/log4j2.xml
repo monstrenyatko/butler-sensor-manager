@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="INFO" shutdownHook="disable"
+	xmlns="http://logging.apache.org/log4j/2.0/config">
+	<Properties>
+		<property name="name">butler-sensor-manager</property>
+		<property name="dir">/var/log</property>
+		<property name="pattern">%d{yyy-MM-dd HH:mm:ss.SSS} : %t : [%-5level] - %logger{1}[%line] : %message%n</property>
+	</Properties>
+	<Appenders>
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout>
+				<Pattern>${pattern}</Pattern>
+			</PatternLayout>
+		</Console>
+		<RollingFile name="RollingFile" fileName="${dir}/${name}.log" immediateFlush="true" append="true"
+			filePattern="${dir}/${name}.log-%d{yyyyMMdd}-%i.gz">
+			<PatternLayout>
+				<Pattern>${pattern}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy/>
+				<SizeBasedTriggeringPolicy size="4 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="10">
+				<Delete basePath="${dir}" maxDepth="1" testMode="true">
+					<IfFileName glob="${name}.log-*.gz"/>
+					<IfLastModified age="5d"/>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="info">
+			<AppenderRef ref="Console"/>
+			<AppenderRef ref="RollingFile"/>
+		</Root>
+	</Loggers>
+</Configuration>
