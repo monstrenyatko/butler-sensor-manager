@@ -98,7 +98,18 @@ public class Configuration {
 					JSONObject net = json.getJSONObject("net");
 					if (net.has("mqtt")) {
 						JSONObject mqtt = net.getJSONObject("mqtt");
-						net().mqtt().persistenceDir = mqtt.getString("persistence_dir");
+						if (mqtt.has("server_uri")) {
+							net().mqtt().serverURI = mqtt.getString("server_uri");
+						}
+						if (mqtt.has("persistence_dir")) {
+							net().mqtt().persistenceDir = mqtt.getString("persistence_dir");
+						}
+					}
+					if (net.has("data_db")) {
+						JSONObject dataDb = net.getJSONObject("data_db");
+						if (dataDb.has("server_uri")) {
+							net().dataDb().serverURI = dataDb.getString("server_uri");
+						}
 					}
 				}
 			}

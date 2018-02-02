@@ -1,0 +1,14 @@
+version: '2'
+services:
+  butler-sensor-manager:
+    image: monstrenyatko/rpi-butler-sensor-manager
+    container_name: butler-sensor-manager
+    volumes:
+      - butler-sensor-manager-config:/config:ro
+      - butler-sensor-manager-data:/data
+    restart: unless-stopped
+volumes:
+  butler-sensor-manager-config:
+    external: true
+  butler-sensor-manager-data:
+    external: true

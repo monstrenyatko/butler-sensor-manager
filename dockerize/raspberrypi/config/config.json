@@ -1,0 +1,11 @@
+{
+	"net": {
+		"mqtt": {
+			"persistence_dir": "/data/mqtt",
+			"server_uri": "tcp://mosquitto"
+		},
+		"data_db": {
+			"server_uri": "http://influxdb:8086"
+		}
+	}
+}

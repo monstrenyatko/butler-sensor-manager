@@ -31,7 +31,7 @@ public class DataSendTask extends DataTask {
 				+ " " + "value=" + data.getValue();
 			manager.getContext().getHttp().post(
 				manager.getContext().getConfiguration().net().dataDb().serverURI + "/write",
-				"db=test", payload.getBytes()
+				"db=butler", payload.getBytes()
 			);
 		} catch (Exception e) {
 			log.error("Can't send data, error: " + e.getMessage(), e);
